@@ -1,0 +1,17 @@
+//
+//  UserDTO.swift
+//  CleanArch
+//
+//  Created by Dilshad Haidari on 12/01/26.
+//
+
+import Foundation
+
+struct UserDTO: Codable{
+    let id: Int
+    let name: String
+    
+    func toUser() -> User? {
+        return User(id: id, name: name)
+    }
+}
