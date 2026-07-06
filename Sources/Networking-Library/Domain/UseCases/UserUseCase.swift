@@ -6,7 +6,7 @@
 //
 
 
-struct UserUseCase {
+public struct UserUseCase {
     
     let userRepository: UserRepository
     
@@ -14,7 +14,7 @@ struct UserUseCase {
         self.userRepository = userRepository
     }
     
-    func execute() async throws -> [User] {
+    public func execute() async throws -> [User] {
         return try await self.userRepository.getUserList() as! [User]
     }
 }
