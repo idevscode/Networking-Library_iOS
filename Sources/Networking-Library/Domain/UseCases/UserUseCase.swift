@@ -8,9 +8,9 @@
 
 public struct UserUseCase {
     
-    let userRepository: UserRepository
+    public let userRepository: UserRepository
     
-    init(userRepository: UserRepository){
+    public init(userRepository: UserRepository){
         self.userRepository = userRepository
     }
     

@@ -8,47 +8,64 @@ import Foundation
 
 class NetworkExecutor: NetworkClient {
     
-    
-    
-    
-    func execute<T: Codable>(_ path: String) async throws -> T {
-    
-        guard let url = URL(string: "https://api.escuelajs.co/api/v1/\(path)") else {
-            if #available(iOS 15.0, *) {
-                let (data, response) = try await URLSession.shared.data(for: URLRequest(url: url))
-            } else {
-                try? await withCheckedContinuation({ continuation in
-                    let task = URLSession.shared.dataTask(with: URLRequest(url: url)) { data, resp, error
+    func execute<T>(_ path: String) async throws -> T where T : Decodable & Encodable & Sendable {
+        
+        guard let url =  URL(string: "https://api.escuelajs.co/api/v1/\(path)") else {
+            throw NetworkError.invalidUrl
+        }
+        
+        if #available(iOS 15.0, *) {
+            let (data, resp) = try await URLSession.shared.data(for: URLRequest(url: url))
+            guard let theResponse = resp as? HTTPURLResponse else {
+                throw NetworkError.invalidResponse
+            }
+            
+            guard (200...300).contains(theResponse.statusCode) else {
+                throw NetworkError.httpError(statusCode: theResponse.statusCode)
+            }
+            
+            do {
+                let parsedJson = try JSONDecoder().decode(T.self, from: data)
+                return parsedJson
+                
+            } catch {
+                throw NetworkError.decodingFailed
+            }
+        } else {
+            if #available(iOS 13.0, *) {
+                return try await withCheckedThrowingContinuation { continuation in
+                    let task = URLSession.shared.dataTask(with: URLRequest(url: url)) { data, resp, error in
                         if let error = error {
                             continuation.resume(throwing: error)
-                        }
-                        guard let data, let resp else {
-                            continuation.resume(throwing: URLError(.badServerResponse))
                             return
                         }
-                        
-                        continuation.resume(returning: (data, rsp))
+                        guard let data = data, let resp = resp as? HTTPURLResponse else {
+                            continuation.resume(throwing: NetworkError.invalidResponse)
+                            return
+                        }
+                        guard (200...300).contains(resp.statusCode) else {
+                            continuation.resume(throwing: NetworkError.httpError(statusCode: resp.statusCode))
+                            return
+                        }
+                        do {
+                            let parsedJson = try JSONDecoder().decode(T.self, from: data)
+                            continuation.resume(returning: parsedJson)
+                        } catch {
+                            continuation.resume(throwing: NetworkError.decodingFailed)
+                        }
                     }
-                })
+                    task.resume()
+                }
+            } else {
+                throw NetworkError.unsupportedPlatform
             }
         }
         
-        let (data, response) = try await URLSession.shared.data(for: URLRequest(url: url))
         
-        guard let resp = response as? HTTPURLResponse else {
-            throw NetworkError.invalidResponse
-        }
         
-        guard (200...300).contains(resp.statusCode) else {
-            throw NetworkError.httpError(statusCode: resp.statusCode)
-        }
         
-        do {
-            let fetchedData = try JSONDecoder().decode(T.self, from: data)
-            return fetchedData
-        } catch {
-            throw NetworkError.decodingFailed
-        }
+        
+        
     }
-    
 }
+
