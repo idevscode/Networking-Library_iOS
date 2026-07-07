@@ -7,7 +7,7 @@
 
 import Foundation
 
-class AuthRepoImpl: UserRepository {
+class AuthRepoImpl: ProductRepository {
     
     let networkClient: NetworkClient
     
@@ -15,10 +15,13 @@ class AuthRepoImpl: UserRepository {
         self.networkClient = networkClient
     }
     
-    func getUserList() async throws -> [User] {
+    func getProductList() async throws -> [Product] {
         do {
-             let user : UserDTO = try await networkClient.execute("products")
-            return [user.toUser() ?? User(id: 0, name: "-", email: "-")]
+             let products : [ProductDTO]  = try await networkClient.execute("products")
+            let productList = products.map { dto in
+                dto.toEntity()
+            }
+            return productList
         } catch {
             throw error
         }
