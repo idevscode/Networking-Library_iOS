@@ -7,8 +7,8 @@
 
 
 
-protocol UserRepository {
-    func getUserList() async throws -> [User]
+protocol ProductRepository {
+    func getProductList() async throws -> [Product]
 }
 
 
