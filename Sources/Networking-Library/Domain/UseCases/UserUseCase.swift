@@ -15,7 +15,7 @@ public struct UserUseCase {
     }
     
     public func execute() async throws -> [User] {
-        return try await self.userRepository.getUserList() as! [User]
+        return try await self.userRepository.getUserList()
     }
 }
 

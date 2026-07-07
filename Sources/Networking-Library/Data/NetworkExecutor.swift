@@ -14,7 +14,23 @@ class NetworkExecutor: NetworkClient {
     func execute<T: Codable>(_ path: String) async throws -> T {
     
         guard let url = URL(string: "https://api.escuelajs.co/api/v1/\(path)") else {
-            throw NetworkError.invalidUrl
+            if #available(iOS 15.0, *) {
+                let (data, response) = try await URLSession.shared.data(for: URLRequest(url: url))
+            } else {
+                try? await withCheckedContinuation({ continuation in
+                    let task = URLSession.shared.dataTask(with: URLRequest(url: url)) { data, resp, error
+                        if let error = error {
+                            continuation.resume(throwing: error)
+                        }
+                        guard let data, let resp else {
+                            continuation.resume(throwing: URLError(.badServerResponse))
+                            return
+                        }
+                        
+                        continuation.resume(returning: (data, rsp))
+                    }
+                })
+            }
         }
         
         let (data, response) = try await URLSession.shared.data(for: URLRequest(url: url))

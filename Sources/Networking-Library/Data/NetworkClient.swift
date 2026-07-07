@@ -26,7 +26,22 @@ class NetworkExecutor1: NetworkClient {
             throw NetworkError.invalidUrl
         }
         
-        let (data, resp) = try await URLSession.shared.data(for: URLRequest(url: url))
+        if #available(iOS 15.0, *) {
+            let (data, resp) = try await URLSession.shared.data(for: URLRequest(url: url))
+        } else {
+            try await withCheckedThrowingContinuation { continuation in
+                let task = URLSession.shared.dataTask(with: URLRequest(url: url))
+                if let error = error {
+                    continuation.resume(throwing: error)
+                }
+                guard let data, let resp else {
+                    continuation.resume(throwing: URLError(.badServerResponse))
+                    return
+                }
+                continuation.resume(returning: (data, resp))
+                
+            }
+        }
         
         guard let theResponse = resp as? HTTPURLResponse else {
             throw NetworkError.invalidResponse

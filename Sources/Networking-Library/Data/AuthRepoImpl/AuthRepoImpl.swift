@@ -7,7 +7,7 @@
 
 import Foundation
 
-class AuthaRepoImpl: UserRepo {
+class AuthaRepoImpl: UserRepository {
     
     let networkCLient: NetworkClient
     
@@ -15,11 +15,10 @@ class AuthaRepoImpl: UserRepo {
         self.networkCLient = networkCLient
     }
     
-    func fetchUser() async throws -> User? {
-        do{
-            let request = URLRequest(url: URL(string: "")!)
+    func getUserList() async throws -> [User] {
+        do {
              let user : UserDTO = try await networkCLient.execute("products")
-            return user.toUser()
+            return [user.toUser() ?? User(id: 0, name: "-", email: "-")]
         } catch {
             throw error
         }
