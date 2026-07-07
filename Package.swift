@@ -4,11 +4,11 @@
 import PackageDescription
 
 let package = Package(
-    name: "Networking-Library",
+    name: "Networking-Library_iOS",
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "Networking-Library",
+            name: "Networking-Library_iOS",
             targets: ["Networking-Library"]
         ),
     ],

@@ -7,17 +7,17 @@
 
 import Foundation
 
-class AuthaRepoImpl: UserRepository {
+class AuthRepoImpl: UserRepository {
     
-    let networkCLient: NetworkClient
+    let networkClient: NetworkClient
     
-    init(networkCLient: NetworkClient) {
-        self.networkCLient = networkCLient
+    init(networkClient: NetworkClient) {
+        self.networkClient = networkClient
     }
     
     func getUserList() async throws -> [User] {
         do {
-             let user : UserDTO = try await networkCLient.execute("products")
+             let user : UserDTO = try await networkClient.execute("products")
             return [user.toUser() ?? User(id: 0, name: "-", email: "-")]
         } catch {
             throw error
