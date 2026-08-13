@@ -5,10 +5,10 @@
 //  Created by Dilshad Haidari on 30/01/26.
 //
 import Foundation
-
+/*
 class NetworkExecutor: NetworkClient {
     
-    func execute<T>(_ path: String) async throws -> T where T : Decodable & Encodable & Sendable {
+    func execute<T>(_ request: RequestProtocol) async throws -> T where T : Decodable & Encodable & Sendable {
         
         guard let url =  URL(string: "https://api.escuelajs.co/api/v1/\(path)") else {
             throw NetworkError.invalidUrl
@@ -69,3 +69,4 @@ class NetworkExecutor: NetworkClient {
     }
 }
 
+*/

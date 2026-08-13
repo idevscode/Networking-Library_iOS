@@ -7,7 +7,7 @@
 
 import Foundation
 
-class AuthRepoImpl: ProductRepository {
+class AuthRepoImpl:  AuthRepository {
     
     let networkClient: NetworkClient
     
@@ -15,16 +15,16 @@ class AuthRepoImpl: ProductRepository {
         self.networkClient = networkClient
     }
     
-    func getProductList() async throws -> [Product] {
-        do {
-             let products : [ProductDTO]  = try await networkClient.execute("products")
-            let productList = products.map { dto in
-                dto.toEntity()
-            }
-            return productList
-        } catch {
-            throw error
-        }
+    func sendOTP(mobileNo: String, intent: String, fullName: String?) async throws -> SendOTPEntity {
+        let request: SendOTPRequest = .init(phone: mobileNo, intent: intent, fullName: fullName)
+            let snedOTPResponse : SendOTPDTO = try await networkClient.execute(request)
+        return snedOTPResponse.toEntity()
     }
-
+    
+    func verifyOTP(mobileNo: String, otp: String) async throws -> OTPVerificationEntity {
+        let request: OTPVerificationRequest = .init(phone: mobileNo, otp: otp)
+        let response : OTPVerificationDTO = try await networkClient.execute(request)
+        return response.toEntity()
+    }
+    
 }

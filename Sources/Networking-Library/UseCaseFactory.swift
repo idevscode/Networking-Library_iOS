@@ -7,17 +7,17 @@
 
 import Foundation
 
-public actor UseCaseFactory {
-    
-    private let networkClient: NetworkClient
-    
-    public init(){
-        self.networkClient = NetworkExecutor()
-    }
-    
-    public func makeProductListUseCase() -> ProductListUseCase {
-        let repository = AuthRepoImpl(networkClient: networkClient)
-        return ProductListUseCase(userRepository: repository)
-    }
-    
-}
+//public actor UseCaseFactory {
+//    
+//    private let networkClient: NetworkClient
+//    
+//    public init(){
+//        self.networkClient = NetworkExecutor1()
+//    }
+//    
+//    public func makeProductListUseCase() -> ProductListUseCase {
+//        let repository = AuthRepoImpl(networkClient: networkClient)
+//        return ProductListUseCase(userRepository: repository)
+//    }
+//    
+//}
