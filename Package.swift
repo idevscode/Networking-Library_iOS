@@ -1,4 +1,4 @@
-// swift-tools-version: 6.2
+// swift-tools-version: 5.9
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -6,21 +6,34 @@ import PackageDescription
 let package = Package(
     name: "Networking-Library_iOS",
     platforms: [
-        .iOS(.v16)
+        .iOS(.v16),
+        .macOS(.v13)
     ],
     products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
+        .library(
+            name: "Domain",
+            targets: ["Domain"]
+        ),
+        .library(
+            name: "Data",
+            targets: ["Data"]
+        ),
         .library(
             name: "Networking-Library_iOS",
-            targets: ["Networking-Library"]
+            targets: ["Domain", "Data"]
         ),
     ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "Networking-Library"
+            name: "Domain",
+            path: "Sources/Domain"
         ),
-
+        .target(
+            name: "Data",
+            dependencies: [
+                "Domain"
+            ],
+            path: "Sources/Data"
+        ),
     ]
 )

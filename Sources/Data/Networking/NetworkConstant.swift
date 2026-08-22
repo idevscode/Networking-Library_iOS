@@ -1,8 +1,6 @@
 //
 //  NetworkConstant.swift
-//  Networking-Library_iOS
-//
-//  Created by Dilshad Haidari on 08/08/26.
+//  Data
 //
 
 enum NetworkConstant {
