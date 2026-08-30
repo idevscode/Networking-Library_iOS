@@ -35,5 +35,15 @@ let package = Package(
             ],
             path: "Sources/Data"
         ),
+        .testTarget(
+            name: "DomainTests",
+            dependencies: ["Domain"],
+            path: "Tests/DomainTests"
+        ),
+        .testTarget(
+            name: "DataTests",
+            dependencies: ["Data"],
+            path: "Tests/DataTests"
+        ),
     ]
 )
