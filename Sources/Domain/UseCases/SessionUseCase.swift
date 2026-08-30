@@ -12,7 +12,7 @@ public protocol SessionUseCase: AnyObject {
     var isAuthenticated: Bool { get }
     var authStatePublisher: AnyPublisher<Bool, Never> { get }
 
-    func login(email: String, password: String) async throws
+    func login(phone: String, pin: String, deviceInfo: String) async throws
 
     func createAccount(
         email: String,
@@ -24,6 +24,10 @@ public protocol SessionUseCase: AnyObject {
         fullName: String,
         gender: String
     ) async throws -> UserResponseEntity
+    
+    func verifyOTP(phone: String, otp: String) async throws -> DefaultEntity
+
+    func forgotPin(phone: String) async throws -> DefaultEntity
 
     func logout()
 }

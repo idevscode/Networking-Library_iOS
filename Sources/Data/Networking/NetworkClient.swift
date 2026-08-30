@@ -4,18 +4,34 @@
 //
 
 import Foundation
+import Domain
 
 public enum HTTPMethodType: String, Sendable {
     case GET = "GET"
     case POST = "POST"
 }
 
-enum NetworkError: Error {
+enum NetworkError: Error, LocalizedError {
     case invalidResponse
     case invalidUrl
-    case httpError(statusCode: Int)
+    case httpError(statusCode: Int, errorResponse: ErrorEntity)
     case decodingFailed
     case unsupportedPlatform
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidResponse:
+            return "Invalid server response"
+        case .invalidUrl:
+            return "Invalid URL"
+        case .httpError(_, let errorResponse):
+            return errorResponse.message
+        case .decodingFailed:
+            return "Failed to process server response"
+        case .unsupportedPlatform:
+            return "Unsupported platform"
+        }
+    }
 }
 
 protocol NetworkClient: Sendable {
@@ -32,11 +48,36 @@ final class NetworkExecutor1: NetworkClient {
 
         let (data, resp) = try await URLSession.shared.data(for: theRequest)
         guard let theResponse = resp as? HTTPURLResponse else {
+            print("resp \(resp)")
             throw NetworkError.invalidResponse
         }
 
         guard (200...300).contains(theResponse.statusCode) else {
-            throw NetworkError.httpError(statusCode: theResponse.statusCode)
+            print("❌ HTTP Status Code: \(theResponse.statusCode)")
+
+            do {
+                let parsedError1 = try JSONSerialization.jsonObject(with: data, options: [])
+
+                print("parsedError: \(parsedError1)")
+            } catch {
+                print("Failed to parse JSON: \(error)")
+            }
+            
+            
+            let parsedError = try JSONDecoder().decode(ErrorResponseDTO.self, from: data)
+                print("parsedError : \(parsedError)")
+            
+            
+            throw NetworkError.httpError(statusCode: theResponse.statusCode, errorResponse: parsedError.toEntity())
+            
+        }
+        
+        do {
+            let parsedError1 = try JSONSerialization.jsonObject(with: data, options: [])
+
+            print("parsedError: \(parsedError1)")
+        } catch {
+            print("Failed to parse JSON: \(error)")
         }
 
         do {

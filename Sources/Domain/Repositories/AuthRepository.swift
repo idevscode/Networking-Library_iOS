@@ -9,7 +9,10 @@
 public protocol AuthRepository {
     var hasValidSession: Bool { get }
 
-    func login(email: String, password: String) async throws
+    func login(phone: String, pin: String, deviceInfo: String) async throws
+    func verifyOTP(phone: String, otp: String) async throws -> DefaultEntity
+    func logoutAll() async throws -> DefaultEntity
+    func forgotPin(phone: String) async throws -> DefaultEntity
 
     func createAccount(
         email: String,
@@ -29,7 +32,7 @@ public protocol AuthRepository {
 
 public extension AuthRepository {
     var hasValidSession: Bool { false }
-    func login(email: String, password: String) async throws {}
+    func login(phone: String, pin: String, deviceInfo: String) async throws {}
     func clearSession() {}
     
 }
