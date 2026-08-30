@@ -10,15 +10,16 @@ nonisolated struct RegisterAccountDTO: Decodable, Sendable {
     let success: Bool
     let message: String
     let data: UserDataDTO
-
+    let meta: MetaDTO
     enum CodingKeys: String, CodingKey {
         case success
         case message
         case data
+        case meta
     }
 
     func toEntity() -> UserResponseEntity {
-        UserResponseEntity(success: success, message: message, user: data.user.toEntity())
+        UserResponseEntity(success: success, message: message, user: data.user.toEntity(), meta: meta.toEntity())
     }
 }
 
@@ -38,6 +39,8 @@ nonisolated struct UserDTO: Decodable, Sendable {
     let phoneVerified: Bool
     let createdAt: String
     let emergencyContacts: [EmergencyContactDTO]
+    
+    
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -49,6 +52,7 @@ nonisolated struct UserDTO: Decodable, Sendable {
         case phoneVerified = "phone_verified"
         case createdAt = "created_at"
         case emergencyContacts = "emergency_contacts"
+        
     }
 
     func toEntity() -> UserEntity {
@@ -66,11 +70,22 @@ nonisolated struct UserDTO: Decodable, Sendable {
     }
 }
 
+nonisolated struct MetaDTO: Decodable, Sendable {
+    let debugOtp: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case debugOtp = "debug_otp"
+    }
+    func toEntity() -> MetaEntity {
+        MetaEntity(otp: debugOtp)
+    }
+    
+}
+
 nonisolated struct EmergencyContactDTO: Decodable, Sendable {
     func toEntity() -> EmergencyContactEntity {
         EmergencyContactEntity()
     }
 }
 
-nonisolated struct MetaDTO: Decodable, Sendable {}
 nonisolated struct ErrorsDTO: Decodable, Sendable {}

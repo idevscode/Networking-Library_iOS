@@ -21,8 +21,8 @@ public final class DefaultSessionUseCase: SessionUseCase {
         self.authStateSubject = CurrentValueSubject(authRepository.hasValidSession)
     }
 
-    public func login(email: String, password: String) async throws {
-        try await authRepository.login(email: email, password: password)
+    public func login(phone: String, pin: String, deviceInfo: String) async throws {
+        try await authRepository.login(phone: phone, pin: pin, deviceInfo: deviceInfo)
         authStateSubject.send(true)
     }
 
@@ -46,8 +46,18 @@ public final class DefaultSessionUseCase: SessionUseCase {
             fullName: fullName,
             gender: gender
         )
+//        authStateSubject.send(true)
+        return entity
+    }
+    
+    public func verifyOTP(phone: String, otp: String) async throws -> DefaultEntity{
+        let entity: DefaultEntity = try await authRepository.verifyOTP(phone: phone, otp: otp)
         authStateSubject.send(true)
         return entity
+    }
+    
+    public func forgotPin(phone: String) async throws -> DefaultEntity {
+        return try await authRepository.forgotPin(phone: phone)
     }
 
     public func logout() {
