@@ -3,6 +3,10 @@
 //  Data
 //
 
+import Foundation
+
 enum NetworkConstant {
-    static let baseURL: String = "http://69.62.127.177:8002/"
+    static var baseURL: String {
+        NetworkConfiguration.shared.baseURL
+    }
 }
