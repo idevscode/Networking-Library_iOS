@@ -5,20 +5,28 @@
 //  Created by Dilshad Haidari on 29/08/26.
 //
 
-struct VerifyOTPRequest: RequestProtocol, Codable, Sendable {
+import Domain
+
+struct VerifyOTPRequest: RequestProtocol, Sendable {
     let phone: String
     let otp: String
+    let flow: VerifyOTPFlow
     
     init(
         phone: String,
         otp: String,
+        flow: VerifyOTPFlow
     ) {
         self.phone = phone
         self.otp = otp
+        self.flow = flow
     }
 
     var path: String {
-        "api/v1/auth/verify-phone"
+        return   flow == .signup ?
+           "api/v1/auth/verify-phone"
+           :
+           "api/v1/auth/verify-otp"
     }
 
     var methodType: HTTPMethodType {

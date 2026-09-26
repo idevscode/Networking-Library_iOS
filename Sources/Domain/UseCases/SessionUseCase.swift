@@ -25,9 +25,35 @@ public protocol SessionUseCase: AnyObject {
         gender: String
     ) async throws -> UserResponseEntity
     
-    func verifyOTP(phone: String, otp: String) async throws -> DefaultEntity
+    func verifyOTP(phone: String, otp: String, flow: VerifyOTPFlow) async throws -> VerifyOTPResponseEntity
 
     func forgotPin(phone: String) async throws -> DefaultEntity
+    
+    func resetPin(resetToken: String, pin: String) async throws -> DefaultEntity
+
+    func enrollBiometric(
+        deviceId: String,
+        deviceName: String,
+        platform: String,
+        publicKey: String,
+        algorithm: String
+    ) async throws -> BiometricEnrolResponseEntity
+
+    func getBiometricChallenge(
+        phone: String,
+        deviceId: String
+    ) async throws -> BiometricChallengeResponseEntity
+
+    func verifyBiometric(
+        phone: String,
+        deviceId: String,
+        challenge: String,
+        signature: String
+    ) async throws -> BiometricVerifyResponseEntity
+
+    /// Validates the current session by calling GetMe against the backend.
+    /// Returns `true` if the stored token is still valid, `false` otherwise.
+    func validateSession() async -> Bool
 
     func logout()
 }

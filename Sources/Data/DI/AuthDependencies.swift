@@ -14,7 +14,11 @@ public final class AuthDependencies {
     public static func makeSessionUseCase() -> SessionUseCase {
         let networkClient = NetworkExecutor1()
         let repository = AuthRepoImpl(networkClient: networkClient)
-        return DefaultSessionUseCase(authRepository: repository)
+        let profileUseCase = MainDependencies.makeGetMyProfileUseCase()
+        return DefaultSessionUseCase(
+            authRepository: repository,
+            getMyProfileUseCase: profileUseCase
+        )
     }
 
     public static func makeAuthRepository() -> AuthRepository {
