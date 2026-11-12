@@ -15,7 +15,7 @@ public final class AcceptGuardianInviteUseCase {
         self.repository = repository
     }
     
-    public func execute(guardianId: String, code: String = "123456") async throws -> GuardianEntity {
+    public func execute(guardianId: String, code: String) async throws -> GuardianEntity {
         return try await repository.acceptGuardianRequest(guardianId: guardianId, code: code)
     }
 }

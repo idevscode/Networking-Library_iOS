@@ -18,6 +18,10 @@ public protocol MainRepository {
     func resendGuardianInviteRequest(guardianId: String) async throws -> DefaultEntity
     
     func addGuardian(fullName: String, email: String, phone: String?, relationship: String?) async throws -> GuardianEntity
+    
+    func pendingGuardianList() async throws -> [GuardianRequesterEntity]
+    
+    func guardianWatchingPerson() async throws -> [WatchingPersonEntity]
 }
 
 //CheckedContinuation

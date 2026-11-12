@@ -11,7 +11,7 @@ import Foundation
 public final class NetworkConfiguration: @unchecked Sendable {
     public static let shared = NetworkConfiguration()
 
-    private(set) var baseURL: String = ""
+    public private(set) var baseURL: String = ""
 
     private init() {}
 

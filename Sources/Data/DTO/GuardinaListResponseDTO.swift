@@ -52,3 +52,28 @@ struct Guardian: Decodable, Sendable {
     }
     
 }
+/*
+ parsedError: {
+     data =     (
+                 {
+             id = "1bb27a90-885a-4695-b8af-decb542904eb";
+             "invited_at" = "2026-09-24T01:18:30.331031";
+             "relationship_label" = Self;
+             requester =             {
+                 email = "Dilshad.haidari@gmail.com";
+                 "full_name" = "Aman kumar";
+                 id = "1a718127-3d68-4c0f-b2e2-76db5dc4f9b6";
+                 phone = "+918083170499";
+             };
+             status = invited;
+         }
+     );
+     errors = "<null>";
+     message = "You have 1 pending invitation(s)";
+     meta =     {
+         count = 1;
+     };
+     success = 1;
+ }
+ 
+ */
