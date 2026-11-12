@@ -22,15 +22,32 @@ public protocol JourneyRepository: Sendable {
     /// Fetch a single journey by ID
     func getJourney(id: String) async throws -> JourneyEntity
 
-    /// Stop/end an active journey
+    /// Stop/end an active journey with status and optional final ping
+    func stopJourney(
+        id: String,
+        status: String,
+        finalPing: JourneyPingItemEntity?
+    ) async throws -> JourneyEntity
+
+    /// Stop/end an active journey (convenience)
     func stopJourney(id: String) async throws -> JourneyEntity
 
-    /// Report periodic GPS location ping with optional deviation metadata
+    /// Report periodic GPS location pings to backend
     func sendLocationPing(
         journeyId: String,
-        lat: Double,
-        lng: Double,
-        isDeviated: Bool?,
-        deviationDistanceM: Double?
-    ) async throws
+        pings: [JourneyPingItemEntity]
+    ) async throws -> SendJourneyPingResponseEntity
+
+    /// Send device heartbeat status
+    func sendDeviceStatus(journeyId: String, status: DeviceStatusEntity) async throws
+
+    /// Track a journey with full route geometry, metadata, and ping history
+    func trackJourney(journeyId: String) async throws -> JourneyTrackEntity
 }
+
+public extension JourneyRepository {
+    func stopJourney(id: String) async throws -> JourneyEntity {
+        try await stopJourney(id: id, status: "completed", finalPing: nil)
+    }
+}
+

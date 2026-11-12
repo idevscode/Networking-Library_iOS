@@ -34,8 +34,12 @@ final class JourneyRepoImpl: JourneyRepository {
 
     func getActiveJourney() async throws -> JourneyEntity? {
         let request = GetActiveJourneyRequest()
-        let response: ActiveJourneyResponseDTO = try await networkClient.execute(request)
-        return response.toEntity()
+        do {
+            let response: ActiveJourneyResponseDTO = try await networkClient.execute(request)
+            return response.toEntity()
+        } catch let NetworkError.httpError(statusCode, _) where statusCode == 404 {
+            return nil
+        }
     }
 
     func getJourney(id: String) async throws -> JourneyEntity {
@@ -44,26 +48,48 @@ final class JourneyRepoImpl: JourneyRepository {
         return response.toEntity()
     }
 
-    func stopJourney(id: String) async throws -> JourneyEntity {
-        let request = StopJourneyRequest(journeyId: id)
+    func stopJourney(
+        id: String,
+        status: String = "completed",
+        finalPing: JourneyPingItemEntity? = nil
+    ) async throws -> JourneyEntity {
+        let request = StopJourneyRequest(
+            journeyId: id,
+            status: status,
+            finalPing: finalPing
+        )
         let response: GetJourneyResponseDTO = try await networkClient.execute(request)
         return response.toEntity()
     }
 
     func sendLocationPing(
         journeyId: String,
-        lat: Double,
-        lng: Double,
-        isDeviated: Bool?,
-        deviationDistanceM: Double?
-    ) async throws {
+        pings: [JourneyPingItemEntity]
+    ) async throws -> SendJourneyPingResponseEntity {
         let request = SendJourneyPingRequest(
             journeyId: journeyId,
-            lat: lat,
-            lng: lng,
-            isDeviated: isDeviated,
-            deviationDistanceM: deviationDistanceM
+            pings: pings
         )
-        let _: DefaultResponseDTO = try await networkClient.execute(request)
+        let response: SendJourneyPingResponseDTO = try await networkClient.execute(request)
+        return response.toEntity()
+    }
+
+    func sendDeviceStatus(journeyId: String, status: DeviceStatusEntity) async throws {
+        let request = DeviceStatusRequest(journeyId: journeyId, status: status)
+        do {
+            let _: DeviceStatusResponseDTO = try await networkClient.execute(request)
+        } catch {
+            // Silently swallow HTTP errors (heartbeat is fire-and-forget)
+        }
+    }
+
+    func trackJourney(journeyId: String) async throws -> JourneyTrackEntity {
+        let request = TrackJourneyRequest(journeyId: journeyId)
+        let response: JourneyTrackResponseDTO = try await networkClient.execute(request)
+        guard let entity = response.toEntity() else {
+            throw NetworkError.decodingFailed
+        }
+        return entity
     }
 }
+

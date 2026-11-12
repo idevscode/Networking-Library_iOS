@@ -58,4 +58,16 @@ final class MainRepositoryImpl: MainRepository {
         let response: AddGuardianResponseDTO = try await networkClient.execute(request)
         return response.toEntity()
     }
+    
+    func pendingGuardianList() async throws -> [GuardianRequesterEntity] {
+        let request = PendingGuardianRequest()
+        let response: InvitationResponse = try await networkClient.execute(request)
+        return response.requesterListEntity()
+    }
+    
+    func guardianWatchingPerson() async throws -> [WatchingPersonEntity] {
+        let request = GetWatchedPeopleRequest()
+        let response: WatchingPersonResponse = try await networkClient.execute(request)
+        return response.toEntity()
+    }
 }

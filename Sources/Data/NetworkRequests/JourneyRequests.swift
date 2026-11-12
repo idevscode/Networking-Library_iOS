@@ -85,6 +85,18 @@ struct GetJourneyRequest: RequestProtocol, Sendable {
 // MARK: - StopJourneyRequest (POST api/v1/journeys/{id}/stop)
 struct StopJourneyRequest: RequestProtocol, Sendable {
     let journeyId: String
+    let status: String
+    let finalPing: JourneyPingItemEntity?
+
+    init(
+        journeyId: String,
+        status: String = "completed",
+        finalPing: JourneyPingItemEntity? = nil
+    ) {
+        self.journeyId = journeyId
+        self.status = status
+        self.finalPing = finalPing
+    }
 
     var path: String {
         "api/v1/journeys/\(journeyId)/stop"
@@ -95,17 +107,28 @@ struct StopJourneyRequest: RequestProtocol, Sendable {
     }
 
     var parameters: [String: Any]? {
-        [:]
+        var body: [String: Any] = [
+            "status": status
+        ]
+        if let ping = finalPing {
+            body["final_ping"] = [
+                "lat": ping.lat,
+                "lng": ping.lng,
+                "accuracy_m": ping.accuracyM,
+                "speed_mps": ping.speedMps,
+                "heading": ping.heading,
+                "battery_level": ping.batteryLevel,
+                "recorded_at": ping.recordedAt
+            ]
+        }
+        return body
     }
 }
 
 // MARK: - SendJourneyPingRequest (POST api/v1/journeys/{id}/pings)
 struct SendJourneyPingRequest: RequestProtocol, Sendable {
     let journeyId: String
-    let lat: Double
-    let lng: Double
-    let isDeviated: Bool?
-    let deviationDistanceM: Double?
+    let pings: [JourneyPingItemEntity]
 
     var path: String {
         "api/v1/journeys/\(journeyId)/pings"
@@ -116,16 +139,36 @@ struct SendJourneyPingRequest: RequestProtocol, Sendable {
     }
 
     var parameters: [String: Any]? {
-        var body: [String: Any] = [
-            "lat": lat,
-            "lng": lng
+        let pingList: [[String: Any]] = pings.map { ping in
+            [
+                "lat": ping.lat,
+                "lng": ping.lng,
+                "accuracy_m": ping.accuracyM,
+                "speed_mps": ping.speedMps,
+                "heading": ping.heading,
+                "battery_level": ping.batteryLevel,
+                "recorded_at": ping.recordedAt
+            ]
+        }
+        return [
+            "pings": pingList
         ]
-        if let isDeviated = isDeviated {
-            body["is_deviated"] = isDeviated
-        }
-        if let deviationDistanceM = deviationDistanceM {
-            body["deviation_distance_m"] = deviationDistanceM
-        }
-        return body
+    }
+}
+
+// MARK: - TrackJourneyRequest (GET api/v1/journeys/{id}/track)
+struct TrackJourneyRequest: RequestProtocol, Sendable {
+    let journeyId: String
+
+    var path: String {
+        "api/v1/journeys/\(journeyId)/track"
+    }
+
+    var methodType: HTTPMethodType {
+        .GET
+    }
+
+    var parameters: [String: Any]? {
+        nil
     }
 }

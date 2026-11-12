@@ -156,7 +156,7 @@ final class DataTests: XCTestCase {
         XCTAssertEqual(entity.email, "rohan@example.com")
         XCTAssertEqual(entity.phone, "+919876543213")
         XCTAssertEqual(entity.relationship, "Brother")
-        XCTAssertEqual(entity.status, "invited")
+        XCTAssertEqual(entity.status, .invited)
     }
 
     func testAcceptGuardianResponseDTODecoding() throws {
@@ -198,6 +198,106 @@ final class DataTests: XCTestCase {
         XCTAssertEqual(entity.email, "aanya@example.com")
         XCTAssertEqual(entity.phone, "+14155550188")
         XCTAssertEqual(entity.relationship, "Mother")
+        XCTAssertEqual(entity.status, .invited)
+    }
+
+    func testGrantConsentResponseDTODecoding() throws {
+        let jsonString = """
+        {
+          "success": true,
+          "message": "Request completed successfully",
+          "data": {
+            "id": "consent-789",
+            "subject_type": "guardian",
+            "subject_id": "guardian-123",
+            "scope": "journey",
+            "level": "journey_only",
+            "granted_at": "2026-09-28T06:58:03.329Z",
+            "revoked_at": null
+          },
+          "meta": {},
+          "errors": {}
+        }
+        """
+
+        let data = jsonString.data(using: .utf8)!
+        let dto = try JSONDecoder().decode(GrantConsentResponseDTO.self, from: data)
+
+        XCTAssertTrue(dto.success)
+        XCTAssertEqual(dto.message, "Request completed successfully")
+        XCTAssertEqual(dto.data.id, "consent-789")
+        XCTAssertEqual(dto.data.subjectType, "guardian")
+        XCTAssertEqual(dto.data.subjectId, "guardian-123")
+        XCTAssertEqual(dto.data.scope, "journey")
+        XCTAssertEqual(dto.data.level, "journey_only")
+        XCTAssertEqual(dto.data.grantedAt, "2026-09-28T06:58:03.329Z")
+        XCTAssertNil(dto.data.revokedAt)
+
+        let entity = dto.toEntity()
+        XCTAssertEqual(entity.id, "consent-789")
+        XCTAssertEqual(entity.subjectType, "guardian")
+        XCTAssertEqual(entity.subjectId, "guardian-123")
+        XCTAssertEqual(entity.scope, "journey")
+        XCTAssertEqual(entity.level, "journey_only")
+        XCTAssertEqual(entity.grantedAt, "2026-09-28T06:58:03.329Z")
+        XCTAssertNil(entity.revokedAt)
+    }
+
+    func testInvitationResponseDTODecoding() throws {
+        let jsonString = """
+        {
+            "data": [
+                {
+                    "id": "1bb27a90-885a-4695-b8af-decb542904eb",
+                    "invited_at": "2026-09-24T01:18:30.331031",
+                    "relationship_label": "Self",
+                    "requester": {
+                        "email": "Dilshad.haidari@gmail.com",
+                        "full_name": "Aman kumar",
+                        "id": "1a718127-3d68-4c0f-b2e2-76db5dc4f9b6",
+                        "phone": "+918083170499"
+                    },
+                    "status": "invited"
+                }
+            ],
+            "errors": null,
+            "message": "You have 1 pending invitation(s)",
+            "meta": {
+                "count": 1
+            },
+            "success": true
+        }
+        """
+
+        let data = jsonString.data(using: .utf8)!
+        let dto = try JSONDecoder().decode(InvitationResponse.self, from: data)
+
+        XCTAssertTrue(dto.success)
+        XCTAssertEqual(dto.message, "You have 1 pending invitation(s)")
+        XCTAssertEqual(dto.data.count, 1)
+
+        let item = dto.data[0]
+        XCTAssertEqual(item.id, "1bb27a90-885a-4695-b8af-decb542904eb")
+        XCTAssertEqual(item.invitedAt, "2026-09-24T01:18:30.331031")
+        XCTAssertEqual(item.relationshipLabel, "Self")
+        XCTAssertEqual(item.requester.id, "1a718127-3d68-4c0f-b2e2-76db5dc4f9b6")
+        XCTAssertEqual(item.requester.fullName, "Aman kumar")
+        XCTAssertEqual(item.requester.email, "Dilshad.haidari@gmail.com")
+        XCTAssertEqual(item.requester.phone, "+918083170499")
+        XCTAssertEqual(item.status, "invited")
+
+        let entities = dto.requesterListEntity()
+        XCTAssertEqual(entities.count, 1)
+        let entity = entities[0]
+        XCTAssertEqual(entity.id, "1bb27a90-885a-4695-b8af-decb542904eb")
+        XCTAssertEqual(entity.requesterId, "1a718127-3d68-4c0f-b2e2-76db5dc4f9b6")
+        XCTAssertEqual(entity.fullName, "Aman kumar")
+        XCTAssertEqual(entity.email, "Dilshad.haidari@gmail.com")
+        XCTAssertEqual(entity.phone, "+918083170499")
+        XCTAssertEqual(entity.relationship, "Self")
         XCTAssertEqual(entity.status, "invited")
+        XCTAssertEqual(entity.permission, .always)
+        XCTAssertEqual(entity.permissions, .always)
     }
 }
+

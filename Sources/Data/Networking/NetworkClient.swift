@@ -64,14 +64,22 @@ final class NetworkExecutor1: NetworkClient {
             }
 
             do {
-                let parsedError1 = try JSONSerialization.jsonObject(with: data, options: [])
+                print("\nStart----------(-^.^-)----------")
+                print("Start----------(-^.^-)----------\n")
+                let json = try JSONSerialization.jsonObject(with: data, options: [])
                 print("url:", resp.url ?? "")
-                print("parsedError: \(parsedError1)")
+                print("parameters:", request.parameters ?? "")
+                print("headers:", request.header ?? "")
+                print("json: \(json)")
+                print("\nEnd----------(-^.^-)----------")
+                print("End----------(-^.^-)----------\n")
             } catch {
                 print("Raw response:")
                 print(String(data: data, encoding: .utf8) ?? "Unable to convert data to String")
 
                 print("Failed to parse JSON: \(error)")
+                print("\n----------(-^.^-)----------")
+                print("----------(-^.^-)----------\n")
             }
             
             
@@ -86,11 +94,22 @@ final class NetworkExecutor1: NetworkClient {
         saveToken(request: request, response: theResponse)
         
         do {
-            let parsedError1 = try JSONSerialization.jsonObject(with: data, options: [])
+            print("\nStart----------(-^.^-)----------")
+            print("Start----------(-^.^-)----------\n")
+            let json = try JSONSerialization.jsonObject(with: data, options: [])
             print("url:", resp.url ?? "")
-            print("parsedError: \(parsedError1)")
+            print("parameters:", request.parameters ?? "")
+            print("headers:", request.header ?? "")
+            print("json: \(json)")
+            print("\nEnd----------(-^.^-)----------")
+            print("End----------(-^.^-)----------\n")
         } catch {
+            print("Raw response:")
+            print(String(data: data, encoding: .utf8) ?? "Unable to convert data to String")
+
             print("Failed to parse JSON: \(error)")
+            print("\n----------(-^.^-)----------")
+            print("----------(-^.^-)----------\n")
         }
 
         do {

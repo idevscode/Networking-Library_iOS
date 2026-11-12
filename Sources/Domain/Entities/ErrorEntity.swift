@@ -5,6 +5,8 @@
 //  Created by Dilshad Haidari on 22/08/26.
 //
 
+import Foundation
+
 public struct ErrorEntity: Sendable {
     public let message: String
     public let success: Bool
@@ -25,5 +27,28 @@ public struct ErrorMessageEnity: Sendable {
     public init(field: String, message: String) {
         self.field = field
         self.message = message
+    }
+}
+
+public enum DomainNetworkError: Error, LocalizedError, Sendable {
+    case unauthorized
+    case forbidden(message: String)
+    case notFound(message: String)
+    case serverError(statusCode: Int, message: String)
+    case generic(message: String)
+
+    public var errorDescription: String? {
+        switch self {
+        case .unauthorized:
+            return "Session expired"
+        case .forbidden(let message):
+            return message.isEmpty ? "No longer available" : message
+        case .notFound(let message):
+            return message.isEmpty ? "The journey has ended" : message
+        case .serverError(_, let message):
+            return message
+        case .generic(let message):
+            return message
+        }
     }
 }

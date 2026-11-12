@@ -137,3 +137,152 @@ public struct StartJourneyResponseEntity: Sendable {
         self.shares = shares
     }
 }
+
+public struct JourneyPingItemEntity: Codable, Sendable, Hashable {
+    public let lat: Double
+    public let lng: Double
+    public let accuracyM: Double
+    public let speedMps: Double
+    public let heading: Double
+    public let batteryLevel: Int
+    public let recordedAt: String
+    
+    public init(
+        lat: Double,
+        lng: Double,
+        accuracyM: Double = 5.0,
+        speedMps: Double = 0.0,
+        heading: Double = 0.0,
+        batteryLevel: Int = 100,
+        recordedAt: String = ""
+    ) {
+        self.lat = lat
+        self.lng = lng
+        self.accuracyM = accuracyM
+        self.speedMps = speedMps
+        self.heading = heading
+        self.batteryLevel = batteryLevel
+        self.recordedAt = recordedAt
+    }
+}
+
+public struct JourneyDeviationEntity: Identifiable, Codable, Sendable, Hashable {
+    public let id: String
+    public let journeyId: String
+    public let lat: Double
+    public let lng: Double
+    public let accuracyM: Double
+    public let speedMps: Double
+    public let heading: Double
+    public let batteryLevel: Int
+    public let recordedAt: String
+    public let receivedAt: String
+    public let distanceFromRouteM: Double
+    public let isDeviation: Bool
+    
+    public init(
+        id: String,
+        journeyId: String,
+        lat: Double,
+        lng: Double,
+        accuracyM: Double = 0.0,
+        speedMps: Double = 0.0,
+        heading: Double = 0.0,
+        batteryLevel: Int = 100,
+        recordedAt: String = "",
+        receivedAt: String = "",
+        distanceFromRouteM: Double = 0.0,
+        isDeviation: Bool = false
+    ) {
+        self.id = id
+        self.journeyId = journeyId
+        self.lat = lat
+        self.lng = lng
+        self.accuracyM = accuracyM
+        self.speedMps = speedMps
+        self.heading = heading
+        self.batteryLevel = batteryLevel
+        self.recordedAt = recordedAt
+        self.receivedAt = receivedAt
+        self.distanceFromRouteM = distanceFromRouteM
+        self.isDeviation = isDeviation
+    }
+}
+
+public struct SendJourneyPingResponseEntity: Sendable {
+    public let success: Bool
+    public let message: String
+    public let accepted: Int
+    public let rejected: Int
+    public let journey: JourneyEntity?
+    public let deviations: [JourneyDeviationEntity]
+    
+    public init(
+        success: Bool,
+        message: String,
+        accepted: Int,
+        rejected: Int,
+        journey: JourneyEntity?,
+        deviations: [JourneyDeviationEntity] = []
+    ) {
+        self.success = success
+        self.message = message
+        self.accepted = accepted
+        self.rejected = rejected
+        self.journey = journey
+        self.deviations = deviations
+    }
+}
+
+public struct JourneyTrackPingEntity: Identifiable, Codable, Sendable, Hashable {
+    public let id: String
+    public let journeyId: String
+    public let lat: Double
+    public let lng: Double
+    public let accuracyM: Double
+    public let speedMps: Double
+    public let heading: Double
+    public let batteryLevel: Int
+    public let recordedAt: String
+    public let receivedAt: String
+    public let distanceFromRouteM: Double
+    public let isDeviation: Bool
+    
+    public init(
+        id: String,
+        journeyId: String,
+        lat: Double,
+        lng: Double,
+        accuracyM: Double = 0.0,
+        speedMps: Double = 0.0,
+        heading: Double = 0.0,
+        batteryLevel: Int = 100,
+        recordedAt: String = "",
+        receivedAt: String = "",
+        distanceFromRouteM: Double = 0.0,
+        isDeviation: Bool = false
+    ) {
+        self.id = id
+        self.journeyId = journeyId
+        self.lat = lat
+        self.lng = lng
+        self.accuracyM = accuracyM
+        self.speedMps = speedMps
+        self.heading = heading
+        self.batteryLevel = batteryLevel
+        self.recordedAt = recordedAt
+        self.receivedAt = receivedAt
+        self.distanceFromRouteM = distanceFromRouteM
+        self.isDeviation = isDeviation
+    }
+}
+
+public struct JourneyTrackEntity: Sendable {
+    public let journey: JourneyEntity
+    public let pings: [JourneyTrackPingEntity]
+    
+    public init(journey: JourneyEntity, pings: [JourneyTrackPingEntity] = []) {
+        self.journey = journey
+        self.pings = pings
+    }
+}

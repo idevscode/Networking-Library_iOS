@@ -26,6 +26,10 @@ public final class MainDependencies {
         return GetGuardianListUseCase(repository: makeMainRepository())
     }
     
+    public static func makePendingGuardianInviteUseCase() -> PendingGuardianUseCase {
+        return PendingGuardianUseCase(repository: makeMainRepository())
+    }
+    
     public static func makeAddGuardianUseCase() -> AddGuardianUseCase {
         return AddGuardianUseCase(repository: makeMainRepository())
     }
@@ -36,5 +40,13 @@ public final class MainDependencies {
     
     public static func makeUserRepository() -> UserRepository {
         UserDefaultsManager.shared
+    }
+    
+    public static func makeResendGuardianInviteUseCase() -> ResendGuardianInviteUseCase {
+        return ResendGuardianInviteUseCase(repository: makeMainRepository())
+    }
+    
+    public static func makeWatchigPersonUseCase() -> WatchingPersonUsecase {
+        return WatchingPersonUsecase(repository: makeMainRepository())
     }
 }

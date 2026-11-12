@@ -13,6 +13,49 @@ struct RouteCoordinateDTO: Codable, Sendable {
     let lat: Double?
     let lng: Double?
 
+    enum CodingKeys: String, CodingKey {
+        case lat
+        case lng
+    }
+
+    init(lat: Double?, lng: Double?) {
+        self.lat = lat
+        self.lng = lng
+    }
+
+    init(from decoder: Decoder) throws {
+        if let container = try? decoder.container(keyedBy: CodingKeys.self) {
+            if let dLat = try? container.decode(Double.self, forKey: .lat) {
+                self.lat = dLat
+            } else if let sLat = try? container.decode(String.self, forKey: .lat), let d = Double(sLat) {
+                self.lat = d
+            } else {
+                self.lat = nil
+            }
+
+            if let dLng = try? container.decode(Double.self, forKey: .lng) {
+                self.lng = dLng
+            } else if let sLng = try? container.decode(String.self, forKey: .lng), let d = Double(sLng) {
+                self.lng = d
+            } else {
+                self.lng = nil
+            }
+            return
+        }
+
+        if var arrContainer = try? decoder.unkeyedContainer() {
+            if let first = try? arrContainer.decode(Double.self),
+               let second = try? arrContainer.decode(Double.self) {
+                self.lat = first
+                self.lng = second
+                return
+            }
+        }
+
+        self.lat = nil
+        self.lng = nil
+    }
+
     func toEntity() -> RouteCoordinateEntity {
         RouteCoordinateEntity(
             lat: lat ?? 0.0,
@@ -160,5 +203,148 @@ nonisolated struct GetJourneyResponseDTO: Decodable, Sendable {
 
     func toEntity() -> JourneyEntity {
         data.toEntity()
+    }
+}
+
+// MARK: - JourneyDeviationDTO
+struct JourneyDeviationDTO: Codable, Sendable {
+    let id: String?
+    let journeyId: String?
+    let lat: Double?
+    let lng: Double?
+    let accuracyM: Double?
+    let speedMps: Double?
+    let heading: Double?
+    let batteryLevel: Int?
+    let recordedAt: String?
+    let receivedAt: String?
+    let distanceFromRouteM: Double?
+    let isDeviation: Bool?
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case journeyId = "journey_id"
+        case lat
+        case lng
+        case accuracyM = "accuracy_m"
+        case speedMps = "speed_mps"
+        case heading
+        case batteryLevel = "battery_level"
+        case recordedAt = "recorded_at"
+        case receivedAt = "received_at"
+        case distanceFromRouteM = "distance_from_route_m"
+        case isDeviation = "is_deviation"
+    }
+
+    func toEntity() -> JourneyDeviationEntity {
+        JourneyDeviationEntity(
+            id: id ?? UUID().uuidString,
+            journeyId: journeyId ?? "",
+            lat: lat ?? 0.0,
+            lng: lng ?? 0.0,
+            accuracyM: accuracyM ?? 0.0,
+            speedMps: speedMps ?? 0.0,
+            heading: heading ?? 0.0,
+            batteryLevel: batteryLevel ?? 100,
+            recordedAt: recordedAt ?? "",
+            receivedAt: receivedAt ?? "",
+            distanceFromRouteM: distanceFromRouteM ?? 0.0,
+            isDeviation: isDeviation ?? false
+        )
+    }
+}
+
+// MARK: - SendJourneyPingResponseDTO (POST /api/v1/journeys/{id}/pings)
+nonisolated struct SendJourneyPingResponseDTO: Decodable, Sendable {
+    let success: Bool
+    let message: String
+    let data: SendJourneyPingDataDTO?
+
+    struct SendJourneyPingDataDTO: Decodable, Sendable {
+        let accepted: Int?
+        let rejected: Int?
+        let journey: JourneyDTO?
+        let deviations: [JourneyDeviationDTO]?
+    }
+
+    func toEntity() -> SendJourneyPingResponseEntity {
+        SendJourneyPingResponseEntity(
+            success: success,
+            message: message,
+            accepted: data?.accepted ?? 0,
+            rejected: data?.rejected ?? 0,
+            journey: data?.journey?.toEntity(),
+            deviations: data?.deviations?.map { $0.toEntity() } ?? []
+        )
+    }
+}
+
+// MARK: - JourneyTrackPingDTO
+struct JourneyTrackPingDTO: Codable, Sendable {
+    let id: String?
+    let journeyId: String?
+    let lat: Double?
+    let lng: Double?
+    let accuracyM: Double?
+    let speedMps: Double?
+    let heading: Double?
+    let batteryLevel: Int?
+    let recordedAt: String?
+    let receivedAt: String?
+    let distanceFromRouteM: Double?
+    let isDeviation: Bool?
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case journeyId = "journey_id"
+        case lat
+        case lng
+        case accuracyM = "accuracy_m"
+        case speedMps = "speed_mps"
+        case heading
+        case batteryLevel = "battery_level"
+        case recordedAt = "recorded_at"
+        case receivedAt = "received_at"
+        case distanceFromRouteM = "distance_from_route_m"
+        case isDeviation = "is_deviation"
+    }
+
+    func toEntity() -> JourneyTrackPingEntity {
+        JourneyTrackPingEntity(
+            id: id ?? UUID().uuidString,
+            journeyId: journeyId ?? "",
+            lat: lat ?? 0.0,
+            lng: lng ?? 0.0,
+            accuracyM: accuracyM ?? 0.0,
+            speedMps: speedMps ?? 0.0,
+            heading: heading ?? 0.0,
+            batteryLevel: batteryLevel ?? 100,
+            recordedAt: recordedAt ?? "",
+            receivedAt: receivedAt ?? "",
+            distanceFromRouteM: distanceFromRouteM ?? 0.0,
+            isDeviation: isDeviation ?? false
+        )
+    }
+}
+
+// MARK: - JourneyTrackResponseDTO (GET /api/v1/journeys/{id}/track)
+nonisolated struct JourneyTrackResponseDTO: Decodable, Sendable {
+    let success: Bool
+    let message: String
+    let data: JourneyTrackDataDTO?
+
+    struct JourneyTrackDataDTO: Decodable, Sendable {
+        let journey: JourneyDTO?
+        let pings: [JourneyTrackPingDTO]?
+    }
+
+    func toEntity() -> JourneyTrackEntity? {
+        guard let journey = data?.journey?.toEntity() else {
+            return nil
+        }
+        return JourneyTrackEntity(
+            journey: journey,
+            pings: data?.pings?.map { $0.toEntity() } ?? []
+        )
     }
 }

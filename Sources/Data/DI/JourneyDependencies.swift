@@ -32,4 +32,16 @@ public final class JourneyDependencies {
     public static func makeSendJourneyPingUseCase() -> SendJourneyPingUseCase {
         return SendJourneyPingUseCase(repository: makeJourneyRepository())
     }
+
+    public static func makeSendDeviceStatusUseCase() -> SendDeviceStatusUseCase {
+        return DefaultSendDeviceStatusUseCase(repository: makeJourneyRepository())
+    }
+
+    public static func makeJourneyWebSocketClient() -> JourneyWebSocketClientProtocol {
+        return JourneyWebSocketClient()
+    }
+
+    public static func makeTrackJourneyUseCase() -> TrackJourneyUseCase {
+        return TrackJourneyUseCase(repository: makeJourneyRepository())
+    }
 }
